@@ -1,6 +1,6 @@
 $('.my-date').hijriDate({
-            showGregDate: true,
-            showWeekDay: true,
+            showGregDate: false,
+            showWeekDay: false,
             separator: '&nbsp&nbsp|&nbsp&nbsp',
             weekDayLang: 'ru',
             gregLang: 'ru',
