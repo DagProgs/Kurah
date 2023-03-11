@@ -1,10 +1,11 @@
-const PRECACHE = 'kurah-v2';
-const RUNTIME = 'runtime-v1';
+const PRECACHE = 'kurah-v3';
+const RUNTIME = 'runtime-v3';
  
 // A list of local resources we always want to be cached.
 const PRECACHE_URLS = [
   './index.html',
-  './'
+  './',
+  'https://dagprogs.github.io/jsonapi/json/db.json'
 ];
  
 // The install handler takes care of precaching the resources we always need.
