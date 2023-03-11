@@ -1,57 +1,90 @@
-const PRECACHE = 'kurah-v3';
-const RUNTIME = 'runtime-v3';
- 
-// A list of local resources we always want to be cached.
-const PRECACHE_URLS = [
-  './index.html',
-  './',
-  'https://dagprogs.github.io/jsonapi/json/db.json'
+var CACHE_NAME = 'my-web-app-cache';
+var urlsToCache = [
+  '/index.html',
+  '/'
 ];
- 
-// The install handler takes care of precaching the resources we always need.
-self.addEventListener('install', event => {
+
+self.addEventListener('install', function(event) {
+  // event.waitUntil принимает промис для того, чтобы узнать,
+  // сколько времени займёт установка, и успешно
+  // или нет она завершилась.
   event.waitUntil(
-    caches.open(PRECACHE)
-      .then(cache => cache.addAll(PRECACHE_URLS))
-      .then(self.skipWaiting())
+    caches.open(CACHE_NAME)
+      .then(function(cache) {
+        console.log('Opened cache');
+        return cache.addAll(urlsToCache);
+      })
   );
 });
- 
-// The activate handler takes care of cleaning up old caches.
-self.addEventListener('activate', event => {
-  const currentCaches = [PRECACHE, RUNTIME];
-  event.waitUntil(
-    caches.keys().then(cacheNames => {
-      return cacheNames.filter(cacheName => !currentCaches.includes(cacheName));
-    }).then(cachesToDelete => {
-      return Promise.all(cachesToDelete.map(cacheToDelete => {
-        return caches.delete(cacheToDelete);
-      }));
-    }).then(() => self.clients.claim())
-  );
-});
- 
-// The fetch handler serves responses for same-origin resources from a cache.
-// If no response is found, it populates the runtime cache with the response
-// from the network before returning it to the page.
-self.addEventListener('fetch', event => {
-  // Skip cross-origin requests, like those for Google Analytics.
-  if (event.request.url.startsWith(self.location.origin)) {
-    event.respondWith(
-      caches.match(event.request).then(cachedResponse => {
-        if (cachedResponse) {
-          return cachedResponse;
+
+
+
+self.addEventListener('fetch', function(event) {
+  event.respondWith(
+    // Этот метод анализирует запрос и
+    // ищет кэшированные результаты для этого запроса в любом из
+    // созданных сервис-воркером кэшей.
+    caches.match(event.request)
+      .then(function(response) {
+        // если в кэше найдено то, что нужно, мы можем тут же вернуть ответ.
+        if (response) {
+          return response;
         }
- 
-        return caches.open(RUNTIME).then(cache => {
-          return fetch(event.request).then(response => {
-            // Put a copy of the response in the runtime cache.
-            return cache.put(event.request, response.clone()).then(() => {
+
+        // Клонируем запрос. Так как объект запроса - это поток,
+        // обратиться к нему можно лишь один раз. 
+        // При этом один раз мы обрабатываем его для нужд кэширования,
+        // ещё один раз он обрабатывается браузером, для запроса ресурсов, 
+        // поэтому объект запроса нужно клонировать.
+        var fetchRequest = event.request.clone();
+        
+        // В кэше ничего не нашлось, поэтому нужно выполнить загрузку материалов,
+        // что заключается в выполнении сетевого запроса и в возврате данных, если
+        // то, что нужно, может быть получено из сети.
+        return fetch(fetchRequest).then(
+          function(response) {
+            // Проверка того, получили ли мы правильный ответ
+            if(!response || response.status !== 200 || response.type !== 'basic') {
               return response;
-            });
-          });
-        });
+            }
+
+            // Клонирование объекта ответа, так как он тоже является потоком.
+            // Так как нам надо, чтобы ответ был обработан браузером,
+            // а так же кэшем, его нужно клонировать,
+            // поэтому в итоге у нас будет два потока.
+            var responseToCache = response.clone();
+
+            caches.open(CACHE_NAME)
+              .then(function(cache) {
+                // Добавляем ответ в кэш для последующего использования.
+                cache.put(event.request, responseToCache);
+              });
+
+            return response;
+          }
+        );
       })
     );
-  }
-}); 
+});
+
+
+self.addEventListener('activate', function(event) {
+
+  var cacheWhitelist = ['page-1', 'page-2'];
+
+  event.waitUntil(
+    // Получение всех ключей из кэша.
+    caches.keys().then(function(cacheNames) {
+      return Promise.all(
+        // Прохождение по всем кэшированным файлам.
+        cacheNames.map(function(cacheName) {
+          // Если файл из кэша не находится в белом списке,
+          // его следует удалить.
+          if (cacheWhitelist.indexOf(cacheName) === -1) {
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    })
+  );
+});
