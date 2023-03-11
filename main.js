@@ -1,24 +1,15 @@
-/**
- * Registering the Service Worker (SW)
- */
-//Check support for the SW
-if ("serviceWorker" in navigator) {
-  console.log("Service worker supported");
-  //registered once  the page is loaded
-  //so, we add the load event Listener
-  window.addEventListener("load", () => {
-    //Registering the service worker
-    navigator.serviceWorker
-      .register("/sw.js")
-      .then(registration => {
-        //Registration was succesfully
-        console.log(
-          `Service Worker succesfully registered, scope ${registration.scope}`
-        );
-      })
-      .catch(error => {
-        //Registration failed
-        console.log(`There was an error while registering: ${error}`);
-      });
-  });
-}
+if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+          navigator.serviceWorker.register('sw.js').then(function(registration) {
+            // Registration was successful
+            console.log('ServiceWorker registration successful with scope: ', registration.scope);
+          }, function(err) {
+            // registration failed :(
+            console.log('ServiceWorker registration failed: ', err);
+          }).catch(function(err) {
+            console.log(err)
+          });
+        });
+      } else {
+        console.log('service worker is not supported');
+      }
