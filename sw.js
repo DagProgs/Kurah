@@ -2,7 +2,7 @@
 var doCache = true;
 
 // Name our cache
-var CACHE_NAME = 'my-pwa-cache-v4';
+var CACHE_NAME = 'my-pwa-cache-v5';
 
 // Delete old caches that are not our current one!
 self.addEventListener("activate", event => {
@@ -38,6 +38,7 @@ self.addEventListener('install', function(event) {
               // We could also cache any static assets like CSS or images
               const urlsToCache = [
                 "/",
+				"/index.html",
                 assets["main.js"]
               ]
               cache.addAll(urlsToCache)
