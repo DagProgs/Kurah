@@ -1,5 +1,5 @@
 //cache name
-const CACHE_NAME = "kurah-v1";
+const CACHE_NAME = "kurah-v2";
 //we want to cache the next files
 const cacheAssets = ["index.html"];
 //Install event
