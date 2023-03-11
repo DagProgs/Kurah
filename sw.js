@@ -1,90 +1,51 @@
-var CACHE_NAME = 'my-web-app-cache';
-var urlsToCache = [
-  '/index.html',
-  '/'
-];
-
-self.addEventListener('install', function(event) {
-  // event.waitUntil принимает промис для того, чтобы узнать,
-  // сколько времени займёт установка, и успешно
-  // или нет она завершилась.
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(function(cache) {
-        console.log('Opened cache');
-        return cache.addAll(urlsToCache);
+//cache name
+const CACHE_NAME = "kurah-v1";
+//we want to cache the next files
+const cacheAssets = ["index.html"];
+//Install event
+self.addEventListener("install", e => {
+  console.log("Service Worker Installed");
+  e.waitUntil(
+    caches
+      .open(CACHE_NAME)
+      .then(cache => {
+        console.log("From service worker:caching files");
+        cache.addAll(cacheAssets);
+      })
+      .then(() => {
+        self.skipWaiting();
       })
   );
 });
-
-
-
-self.addEventListener('fetch', function(event) {
-  event.respondWith(
-    // Этот метод анализирует запрос и
-    // ищет кэшированные результаты для этого запроса в любом из
-    // созданных сервис-воркером кэшей.
-    caches.match(event.request)
-      .then(function(response) {
-        // если в кэше найдено то, что нужно, мы можем тут же вернуть ответ.
-        if (response) {
-          return response;
-        }
-
-        // Клонируем запрос. Так как объект запроса - это поток,
-        // обратиться к нему можно лишь один раз. 
-        // При этом один раз мы обрабатываем его для нужд кэширования,
-        // ещё один раз он обрабатывается браузером, для запроса ресурсов, 
-        // поэтому объект запроса нужно клонировать.
-        var fetchRequest = event.request.clone();
-        
-        // В кэше ничего не нашлось, поэтому нужно выполнить загрузку материалов,
-        // что заключается в выполнении сетевого запроса и в возврате данных, если
-        // то, что нужно, может быть получено из сети.
-        return fetch(fetchRequest).then(
-          function(response) {
-            // Проверка того, получили ли мы правильный ответ
-            if(!response || response.status !== 200 || response.type !== 'basic') {
-              return response;
-            }
-
-            // Клонирование объекта ответа, так как он тоже является потоком.
-            // Так как нам надо, чтобы ответ был обработан браузером,
-            // а так же кэшем, его нужно клонировать,
-            // поэтому в итоге у нас будет два потока.
-            var responseToCache = response.clone();
-
-            caches.open(CACHE_NAME)
-              .then(function(cache) {
-                // Добавляем ответ в кэш для последующего использования.
-                cache.put(event.request, responseToCache);
-              });
-
-            return response;
-          }
-        );
-      })
-    );
-});
-
-
-self.addEventListener('activate', function(event) {
-
-  var cacheWhitelist = ['page-1', 'page-2'];
-
-  event.waitUntil(
-    // Получение всех ключей из кэша.
-    caches.keys().then(function(cacheNames) {
+//Active event
+self.addEventListener("activate", e => {
+  console.log("Service Worker activated");
+  e.waitUntil(
+    caches.keys().then(cacheNames => {
       return Promise.all(
-        // Прохождение по всем кэшированным файлам.
-        cacheNames.map(function(cacheName) {
-          // Если файл из кэша не находится в белом списке,
-          // его следует удалить.
-          if (cacheWhitelist.indexOf(cacheName) === -1) {
-            return caches.delete(cacheName);
+        cacheNames.map(cache => {
+          if (cache !== CACHE_NAME) {
+            console.log("Cleaning up old cache");
+            return caches.delete(cache);
           }
         })
       );
     })
+  );
+});
+
+//Fetch event
+self.addEventListener("fetch", e => {
+  console.log("fetching cached content");
+  e.respondWith(
+    fetch(e.request)
+      .then(res => {
+        const copyCache = res.clone();
+        caches.open(cacheName).then(cache => {
+          cache.put(e.request, copyCache);
+        });
+        return res;
+      })
+      .catch(error => caches.match(e.request).then(res => res))
   );
 });
