@@ -1,8 +1,8 @@
-const staticCacheName = 'static-kurah11'
-const dynamicCacheName = 'dynamic-kurah11'
+const staticCacheName = 'static-kurah12'
+const dynamicCacheName = 'dynamic-kurah12'
 
 const staticAssets = [
-	
+	'/index.html'
 ];
 
 self.addEventListener('install', async event => {
