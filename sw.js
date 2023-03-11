@@ -1,10 +1,8 @@
-const staticCacheName = 'static-kurah7'
-const dynamicCacheName = 'dynamic-kurah7'
+const staticCacheName = 'static-kurah10'
+const dynamicCacheName = 'dynamic-kurah10'
 
 const staticAssets = [
-	'./',
-    './index.html',
-    'https://dagprogs.github.io/jsonapi/json/db.json'
+	
 ];
 
 self.addEventListener('install', async event => {
