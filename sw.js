@@ -1,22 +1,9 @@
-const staticCacheName = 'static-kurahruznama-v21'
-const dynamicCacheName = 'dynamic-kurahruznama-v21'
+const staticCacheName = 'static-kurah1'
+const dynamicCacheName = 'dynamic-kurah2'
 
 const staticAssets = [
 	'./',
-    './index.html',
-    './offline.html',
-	'./css/menu.css',
-	'./css/style.css',
-    './js/app.js',
-    './js/ar.js',
-	'./js/jquery.hijri.date.min.js',
-	'./js/jquery-3.6.0.min.js',
-	'./js/clock.js',
-	'./js/dayruznama.js',
-	'./js/menu.js',
-	'./js/mount.js',
-	'./js/ru.js',
-	'./js/script.js.js'
+    './index.html'
 ];
 
 self.addEventListener('install', async event => {
