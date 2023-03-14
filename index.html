@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="db/ruznama_k.db"></script>
+    <title>Document</title>
+</head>
+
+<body>
+    <div class="wrapper">
+        <main class="main">
+            <div class="main-box">
+                <h1 class="clock" id="dttime">12:00</h1>
+                <h3 class="error">«Не поддерживается на вашем устройстве»</h3>
+                <div class="foneffect"></div>
+                <video src="video/videoframe.mp4" type="video/mp4" autoplay muted loop class="videoframe"></video>
+                <div class="text-box">
+                    <h2 class="name-text">
+                        Фаджр<br><span id="fajrtime">00:00</span><br><span class="descr">Время утреннего намаза</span>
+                    </h2>
+                    <h2 class="name-text">
+                        Шурук<br><span id="shuruktime">00:00</span><br><span class="descr">Восход солнца</span>
+                    </h2>
+                    <h2 class="name-text">
+                        Зухр<br><span id="zuhrtime">00:00</span><br><span class="descr">Время полуденного намаза</span>
+                    </h2>
+                    <h2 class="name-text">
+                        Аср<br><span id="asrtime">00:00</span><br><span class="descr">Время предвечернего намаза</span>
+                    </h2>
+                    <h2 class="name-text">
+                        Магриб<br><span id="magribtime">00:00</span><br><span class="descr">Время вечернего намаза</span>
+                    </h2>
+                    <h2 class="name-text">
+                        Иша<br><span id="ishatime">00:00</span><br><span class="descr">Время ночного намаза</span>
+                    </h2>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script>
+        function currentTime() {
+            var date = new Date();
+            var hour = date.getHours();
+            var min = date.getMinutes();
+            var sec = date.getSeconds();
+
+            hour = updateTime(hour);
+            min = updateTime(min);
+            sec = updateTime(sec);
+            document.getElementById("dttime").innerText = hour + " : " + min + "  "
+            var t = setTimeout(currentTime, 1000);
+        }
+
+        function updateTime(k) {
+            if (k < 10) {
+                return "0" + k;
+            }
+            else {
+                return k;
+            }
+        }
+
+        currentTime();
+    </script>
+    <script src="js/dayruznama.js"></script>
+</body>
+
+</html>
